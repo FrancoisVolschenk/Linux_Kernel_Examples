@@ -1,7 +1,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
-#include <linux/gpio.h>
-#include <linux/interrupt.h>
+#include <linux/gpio.h> /* This moule was written for the raspberry pi. GPIO allows us to use the pins to interact with hardware */
+#include <linux/interrupt.h> /* this is used for interrupts */
 
 
 MODULE_LICENSE("GPL");
@@ -11,12 +11,14 @@ MODULE_DESCRIPTION("A simple LKM to demonstrate interrupts");
 //var to interrupt controller
 unsigned int irq_number;
 
+/* This function is triggered when the interrupt is called */
 static irq_handler_t intrpt_handler(unsigned int irq, void *dev_id, struct pt_regs *regs)
 {
 	printk("gpio_irq was triggered and ISR was called\n");
 	return (irq_handler_t) IRQ_HANDLED;
 }
 
+/* Request access to the GPIO pin, and set up an interrupt request handler */
 static int __init ModuleInit(void)
 {
 	printk("Successfully loaded interrupt module\n");

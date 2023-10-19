@@ -1,7 +1,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/fs.h>
-#include <linux/cdev.h>
+#include <linux/cdev.h> /* This module is used to create the device file automatically */
 #include <linux/uaccess.h>
 
 MODULE_LICENSE("GPL");
@@ -30,8 +30,10 @@ static int driver_close(struct inode *dev_file, struct file *filp)
 	return 0;
 }
 
+/* This method is called when the device file is read from */
 static ssize_t device_read(struct file *filp, char *user_buffer, size_t count, loff_t *offset)
 {
+	/* Essentially it reads data from an internal buffer and writes it to user space */
 	int to_copy, not_copied, delta;
 	buffer_ptr = sizeof(buffer);
 	to_copy = min(count, buffer_ptr);
@@ -41,6 +43,7 @@ static ssize_t device_read(struct file *filp, char *user_buffer, size_t count, l
 	return delta;
 }
 
+/* This method is called when the device file is written to */
 static ssize_t device_write(struct file *filp, const char *user_buffer, size_t count, loff_t *offset)
 {
 	int to_copy, not_copied, delta;
@@ -63,6 +66,7 @@ static struct file_operations fops = {
 
 static int __init ModuleInit(void)
 {
+	/* This time we create the device file automatically. But if anything goes wrong along the way, we must abort aand cleanup after ourselves */
 	printk("Inserting %s in kernel\n", DEV_NAME);
 	if(alloc_chrdev_region(&Major, 0, 1, DEV_NAME) < 0)
 	{
@@ -102,6 +106,7 @@ static int __init ModuleInit(void)
 	return 0;
 }
 
+/* When the module is unloaded, we need to undo everything that was done in the init method */
 static void __exit ModuleExit(void)
 {
 	printk("Unloading %s from kernel.\n", DEV_NAME);

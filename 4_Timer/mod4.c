@@ -1,8 +1,8 @@
 #include <linux/module.h>
 #include <linux/init.h>
-#include <linux/gpio.h>
-#include <linux/jiffies.h>
-#include <linux/timer.h>
+#include <linux/gpio.h> /* This moule was written for the raspberry pi, gpio allows us to use the pins to control physical hardware */
+#include <linux/jiffies.h> /* Jiffies are used to calculate time differences */
+#include <linux/timer.h> /* This module is used to manage timers */
 
 
 MODULE_LICENSE("GPL");
@@ -11,13 +11,14 @@ MODULE_DESCRIPTION("A simple LKM to demonstrate timer events");
 
 static struct timer_list my_timer;
 
+/* This method is triggered when the timer lapses */
 void timer_callback(struct timer_list * data)
 {
 	printk("Timer callbak - LED Off");
-	gpio_set_value(4, 0);
+	gpio_set_value(4, 0); /* This turns an LED off that was hooked up to the pi */
 }
 
-
+/* This method requests access to the GPIO pin to light up an LED. It also sets up the timer and points it to the correct function to trigger */
 static int __init ModuleInit(void)
 {
 	printk("Successfully loaded the timer module\n");
